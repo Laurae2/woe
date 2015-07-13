@@ -11,6 +11,7 @@
 #' @param vars List of variables. If not specified, all character variables will be used
 #' @param verbose Prints additional details when TRUE. Useful mainly for debugging.
 #' @param rcontrol Additional parameters used for rpart tree generation. Use \code{?rpart.control()} to get more details.
+#' @param cutoff only display IV greater than cutoff, defaulted at 0
 #' @export
 #' @examples
 #' iv.mult(german_data,"gb")
@@ -21,7 +22,7 @@
 #' # Use varlist() function to get all numeric variables
 #' iv.mult(german_data,y="gb",vars=varlist(german_data,"numeric"))
 
-iv.mult <- function(df,y,summary=FALSE,vars=NULL,verbose=FALSE,rcontrol=NULL) {
+iv.mult <- function(df,y,summary=FALSE,vars=NULL,verbose=FALSE,rcontrol=NULL,cutoff=0) {
   if(verbose) {
     cat(paste("Started processing of data frame:", deparse(substitute(df)),"\n"))
   }
@@ -50,17 +51,18 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,verbose=FALSE,rcontrol=NULL) {
                         count(*) as Bins,
                         sum(case when outcome_0 = 0 or outcome_1 = 0 then 1 else 0 end) as ZeroBins
                      from ivlist 
+                     where InformationValue >= cutoff 
                      group by variable 
                      order by InformationValue desc") 
 
-    ivlist$Strength[ivlist$InformationValue >= 1] <- 1
-    ivlist$Strength[ivlist$InformationValue >= .5 & ivlist$InformationValue < 1] <- 2
-    ivlist$Strength[ivlist$InformationValue >= .2 & ivlist$InformationValue < .5] <- 3
-    ivlist$Strength[ivlist$InformationValue >= .1 & ivlist$InformationValue < .2] <- 4
-    ivlist$Strength[ivlist$InformationValue >= .02 & ivlist$InformationValue < .1] <- 5
-    ivlist$Strength[ivlist$InformationValue < .02] <- 6
-    ivlist$Strength <- factor(ivlist$Strength, levels=c(1,2,3,4,5,6), 
-                              labels= c("Suspicious","Very strong","Strong","Average","Weak","Wery weak"))
+    # ivlist$Strength[ivlist$InformationValue >= 1] <- 1
+    # ivlist$Strength[ivlist$InformationValue >= .5 & ivlist$InformationValue < 1] <- 2
+    # ivlist$Strength[ivlist$InformationValue >= .2 & ivlist$InformationValue < .5] <- 3
+    # ivlist$Strength[ivlist$InformationValue >= .1 & ivlist$InformationValue < .2] <- 4
+    # ivlist$Strength[ivlist$InformationValue >= .02 & ivlist$InformationValue < .1] <- 5
+    # ivlist$Strength[ivlist$InformationValue < .02] <- 6
+    # ivlist$Strength <- factor(ivlist$Strength, levels=c(1,2,3,4,5,6), 
+    #                           labels= c("Suspicious","Very strong","Strong","Average","Weak","Very weak"))
   }
   ivlist
 }
