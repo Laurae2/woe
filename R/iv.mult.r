@@ -52,7 +52,7 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,verbose=FALSE,rcontrol=NULL,cut
                         sum(case when outcome_0 = 0 or outcome_1 = 0 then 1 else 0 end) as ZeroBins
                      from ivlist 
                      group by variable 
-                     having InformationValue >= cutoff 
+                     having sum(miv) >= cutoff 
                      order by InformationValue desc") 
 
     # ivlist$Strength[ivlist$InformationValue >= 1] <- 1
