@@ -18,7 +18,7 @@ iv.num <- function(df,x,y,verbose=FALSE,rcontrol=NULL) {
   if(verbose) cat("  Building rpart model",sep="\n")
   #rcontrol <- ifelse(is.null(rcontrol),rpart.control(cp=0.001,minbucket=nrow(df)/10),rcontrol)
   if(is.null(rcontrol)) {
-    rcontrol <- rpart.control(cp=0.001,minbucket=nrow(df)/10)
+    rcontrol <- rpart.control(cp=0.001,minbucket=nrow(df)/20)
   }
   model   <- rpart(data=df,formula=as.integer(df[,y])~df[,x],control=rcontrol)
   if(verbose) cat("  Model finished",sep="\n")
