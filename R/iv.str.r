@@ -41,6 +41,10 @@ iv.str <- function(df,x,y,verbose=FALSE) {
 
   }
 
+  # rename all missing rows to level Missing
+
+  df[,x] <- as.factor(ifelse(is.na(df[,x]),"missing",as.character(df[,x])))
+
   outcome_0 <- outcome_1 <- NULL # This is needed to avoid NOTES about not visible binding from R CMD check
   
   total_0 <- nrow(df) - total_1      
@@ -55,6 +59,7 @@ iv.str <- function(df,x,y,verbose=FALSE) {
   iv_data <-  within(iv_data, {
                 class <- row.names(iv_data)
                 variable <- x
+                pct_bin <- (outcome_0+outcome_1) / (total_0+total_1)
                 pct_0 <- outcome_0 / total_0
                 pct_1 <- outcome_1 / total_1
                 odds <-  pct_0 / pct_1
@@ -66,7 +71,7 @@ iv.str <- function(df,x,y,verbose=FALSE) {
     iv_data$class <- factor(iv_data$class,levels=levels(df[,x]))
   }  
   
-  iv_data <- iv_data[c("variable","class","outcome_0","outcome_1","pct_0","pct_1","odds","woe","miv")]
+  iv_data <- iv_data[c("variable","class","pct_bin","outcome_0","outcome_1","pct_0","pct_1","odds","woe","miv")]
 
   if(any(iv_data$outcome_0 == 0) | any(iv_data$outcome_1 == 0)) {
     warning("Some group for outcome 0 has zero count. This will result in -Inf or Inf WOE. Replacing - ODDS=1, WoE=0, MIV=0. \n The bin is either too small or suspiciously predictive. \n You should fix this before running any model. It does not make any sense to keep WoE = 0 for such bin.")

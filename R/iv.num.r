@@ -39,15 +39,22 @@ iv.num <- function(df,x,y,verbose=FALSE,rcontrol=NULL) {
                   join model_frame mf using (node_id)        
                   join tree_rules tr using (tree_node)")
   t$tmp_iv_calc_label <- factor(t$tmp_iv_calc_label)
+  
+  # recover the sequence number of all non-missing obs in original data set 
+  #row.names(t) <- t$obs_id
+  # replaced by 'by.y=1' in the merge
 
   if(verbose) cat("    DF Merge",sep="\n")
-  df <- merge(df, t["tmp_iv_calc_label"], by=0, all=TRUE) # str(df)
+  
+  # by.x=0 means by row.names
+
+  df <- merge(df, t, by.x=0, by.y=1, all=TRUE) # str(df)
   if(verbose) cat("  Calling iv.str for nodes",sep="\n")
   iv_data <- iv.str(df,"tmp_iv_calc_label",y)
 
   if(verbose) cat("  Formatting output",sep="\n")
   iv_data$variable <- x
 
-  sqldf("select iv.*, tr.sql || woe as sql from iv_data iv join tree_rules tr on (iv.class=tr.class_label) order by tr.min")
+  sqldf("select iv.*, tr.sql || woe as sql from iv_data iv left join tree_rules tr on (iv.class=tr.class_label) order by tr.min,tr.max")
 }
 
