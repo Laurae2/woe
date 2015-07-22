@@ -22,7 +22,7 @@
 #' # Use varlist() function to get all numeric variables
 #' iv.mult(german_data,y="gb",vars=varlist(german_data,"numeric"))
 
-iv.mult <- function(df,y,summary=FALSE,vars=NULL,cutoff=0,verbose=FALSE,rcontrol=NULL) {
+iv.mult <- function(df,y,summary=FALSE,vars=NULL,ivcutoff=0.001,sql=FALSE,verbose=FALSE,rcontrol=NULL,topbin=FALSE,tbcutoff=0.1,tbpct=0.02) {
   if(verbose) {
     cat(paste("Started processing of data frame:", deparse(substitute(df)),"\n"))
   }
@@ -41,6 +41,8 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,cutoff=0,verbose=FALSE,rcontrol
       }
     }
                   )
+
+
   
   if (summary) {
     if (verbose) cat(paste("Preparing summary","\n"))
@@ -49,7 +51,7 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,cutoff=0,verbose=FALSE,rcontrol
                         variable as Variable,
                         sum(miv) as InformationValue, 
                         count(*) as Bins,
-                        sum(case when outcome_0 = 0 or outcome_1 = 0 then 1 else 0 end) as ZeroBins
+                        sum(case when good = 0 or bad = 0 then 1 else 0 end) as ZeroBins
                      from ivlist 
                      group by variable 
                      order by InformationValue desc") 
@@ -62,8 +64,36 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,cutoff=0,verbose=FALSE,rcontrol
     ivlist$Strength[ivlist$InformationValue < .01] <- 6
     ivlist$Strength <- factor(ivlist$Strength, levels=c(1,2,3,4,5,6), 
                               labels= c("Suspicious","Very strong","Strong","Average","Weak","Very weak"))
-    ivlist <- ivlist[ivlist$InformationValue>cutoff,]
+    ivlist <- ivlist[ivlist$InformationValue>ivcutoff,]
+    ivlist
   }
-  ivlist
+  # trim the output, based on sql==true
+  else {
+    if(topbin) {
+      ivlist <- lapply(ivlist, function(x) x[abs(x$inflation)>tbcutoff & x$pct_bin>tbpct,])
+      # remove "var" (data frame in list) with no top bins 
+      ivlist <- ivlist[lapply(ivlist, nrow)>0]
+      if(sql) {
+    ivlist <- lapply(ivlist, function(x) within(x,  sql_code <- paste(sql,"1 else 0",sep="")))
+    lapply(ivlist, function(x) x[,!(colnames(x) %in% c("good","bad","pct_good","pct_bad","odds","sql"))])
+    
+    } else {
+      lapply(ivlist, function(x) x[,!(colnames(x) == "sql")])
+            }
+    }
+    else {
+      # remove "var" (data frame in list) with only 1 bin in WOE, which has no separation power (iv=0)  
+      ivlist <- ivlist[lapply(ivlist, nrow)>1]
+      if(sql) {
+      ivlist <- lapply(ivlist, function(x) within(x,  sql_code <- paste(sql,woe) ))
+      lapply(ivlist, function(x) x[,!(colnames(x) %in% c("good","bad","pct_good","pct_bad","odds","sql"))])
+    
+    } else {
+      lapply(ivlist, function(x) x[,!(colnames(x) == "sql")])
+    }
+  }
+}
+
+
 }
 

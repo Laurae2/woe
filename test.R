@@ -1,7 +1,7 @@
 library(devtools)
 remove.packages("woe")
 
-install_github("oriono/woe")
+#install_github("oriono/woe")
 
 # the following install seems wired. not sure where it installs the package. 
 # install.packages(
@@ -17,9 +17,15 @@ library(woe)
 
 # http://www.r-bloggers.com/r-credit-scoring-woe-information-value-in-woe-package/
 
+tt <-iv.mult(german_data,"gb",cutoff=0.05)
+iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE)
 iv.mult(german_data,"gb",cutoff=0.05)
+iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2)
+iv.mult(german_data,"gb",ivcutoff=0.05,topbin=TRUE)
+iv.mult(german_data,"gb",TRUE)
 
-iv.mult(german_data,"gb")
+
+t <- iv.mult(german_data,"gb")
 
 iv.plot.summary(iv.mult(german_data,"gb",TRUE))
 iv.mult(german_data,"gb",vars=c("housing","duration"))
@@ -35,39 +41,50 @@ a <- german_data
 
 a$duration[a$duration==12] <- NA
 a$housing[a$housing=="for free"] <- NA
-a$housing <- as.factor(ifelse(is.na(a$housing),"Mssing",a$housing))
-table(german_data$housing)
+a$housing <- as.factor(ifelse(is.na(a$housing),"missing",as.character(a$housing)))
+table(a$housing)
 
-iv.mult(a,"gb",TRUE,vars=c("housing","duration"))
+iv.mult(a,"gb",vars=c("housing","duration"))
 iv.mult(german_data,"gb",TRUE,vars=c("housing","duration"))
 sum(is.na(a$duration))
 sum(is.na(german_data$duration))
 
-iv.str(german_data,"housing","gb")
+cc <- iv.num(german_data,"duration","gb")
 b <- german_data
 
 
 iv.str(a,"housing","gb")
-iv.num(german_data,"duration","gb")
-iv.num(a,"duration","gb")s
-
-sum(!is.na(a[a$duration > 43.5 &a$gb =="bad",1]))
-length(a[a$duration >43.5,1])
-length(a[a$duration <=43.5&a$duration >=8.5,1])
-length(a[,1])
+system.time(iv.num(german_data,"duration","gb",verbose=TRUE))
+iv.num(german_data,"duration","gb",rcontrol=rpart.control(cp=0.003))
+system.time(iv.num(a,"duration","gb",verbose=TRUE))
 
 
-# test iv.num block 
+a$obs_id <- row.names(a)
+
+
+levels(iv.binning.simple(german_data,"credit_amount"))
+
+
+# test iv.replace.woe 
+
+a <- german_data
+
+a$duration[a$duration==12] <- NA
+a$housing[a$housing=="for free"] <- NA
+a$housing <- as.factor(ifelse(is.na(a$housing),"missing",as.character(a$housing)))
+table(a$housing)
+
+x <- iv.replace.woe(a,iv.mult(a,"gb",vars=c("duration","housing")))
+
+any(grepl("-Inf",as.character(aa[[2]]$class)))
+
+aa[[2]]$class[grep("-Inf",as.character(aa[[2]]$class))]
+
+# sql output function
+  
+  #char 
+
+  #num 
 
 
 
-
-
-# test block ends
-
-
-
-gllevels(b$housing)
-attributes(b$housing)
-
-table(b$housing)
