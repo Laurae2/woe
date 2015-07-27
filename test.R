@@ -19,7 +19,7 @@ library(woe)
 
 tt <-iv.mult(german_data,"gb",cutoff=0.05)
 iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE)
-iv.mult(german_data,"gb",cutoff=0.05)
+iv.mult(german_data,"gb",ivcutoff=0.05)
 iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2)
 iv.mult(german_data,"gb",ivcutoff=0.05,topbin=TRUE)
 iv.mult(german_data,"gb",TRUE)
@@ -28,7 +28,7 @@ iv.mult(german_data,"gb",TRUE)
 t <- iv.mult(german_data,"gb")
 
 iv.plot.summary(iv.mult(german_data,"gb",TRUE))
-iv.mult(german_data,"gb",vars=c("housing","duration"))
+iv.mult(german_data,"gb",vars=c("housing","duration"),excl="housing")
 
 iv.mult(german_data,"gb",TRUE,vars=c("housing","duration"),rcontrol=rpart.control(cp=0.003))
 
@@ -75,16 +75,33 @@ a$housing <- as.factor(ifelse(is.na(a$housing),"missing",as.character(a$housing)
 table(a$housing)
 
 x <- iv.replace.woe(a,iv.mult(a,"gb",vars=c("duration","housing")))
+c<-rbind.fill(iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
 
-any(grepl("-Inf",as.character(aa[[2]]$class)))
+bb<-iv.replace.woe(iv.replace.woe(a,iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2)),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
 
-aa[[2]]$class[grep("-Inf",as.character(aa[[2]]$class))]
 
 # sql output function
   
-  #char 
+iv.trans.code <- function(vars,iv) {
+  
+  iv_df <- rbind.fill(iv)
+  
+  for (n in vars) { 
+    
+    if(grepl("_woe",n))
+    {  
+      sqlstr <- paste("case",paste(iv_df[iv_df$variable==substr(n,1,nchar(n)-4),]$sql_code,collapse= "\n"),"end as",n,",\n\n")
+      
+    } else {
+      
+      sqlstr <- paste(paste(iv_df[grepl(as.character(n),iv_df$sql_code),]$sql_code,collapse= "\n"),"\n")
+    }
+    sink('transformation code.txt',append=TRUE)
+    cat(sqlstr)
+    sink()
+  }
+  
+}
 
-  #num 
-
-
+iv.trans.code(c("duration_woe","housing_woe"),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
 

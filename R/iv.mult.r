@@ -74,7 +74,7 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,ivcutoff=0.001,sql=FALSE,verbos
       # remove "var" (data frame in list) with no top bins 
       ivlist <- ivlist[lapply(ivlist, nrow)>0]
       if(sql) {
-    ivlist <- lapply(ivlist, function(x) within(x,  sql_code <- paste(sql,"1 else 0",sep="")))
+    ivlist <- lapply(ivlist, function(x) within(x,  sql_code <- paste("case ",sql,"1 else 0 end as ",variable,"_b",rownames(x),sep="")))
     lapply(ivlist, function(x) x[,!(colnames(x) %in% c("good","bad","pct_good","pct_bad","odds","sql"))])
     
     } else {

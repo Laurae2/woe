@@ -70,7 +70,8 @@ iv.str <- function(df,x,y,sql=TRUE,verbose=FALSE) {
                 woe <- log(odds)
                 miv <- (pct_bad - pct_good) * woe 
                 sql <- paste('when ',variable,ifelse(class=='missing',' is ',' = "'),
-                              ifelse(class=='missing','null', class),'" then',sep="")   
+                              ifelse(class=='missing','null', class),
+                              ifelse(class=='missing',' then ','" then '),sep="")   
   })
 
   if(is.factor(df[,x])) {

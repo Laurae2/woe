@@ -30,16 +30,15 @@ iv_df <- rbind.fill(iv)
    variable_name_woe <- paste(variable_name,"_woe",sep="")
 
   if(verbose) {
-    cat(paste0("Var Name: ",variable_name,"\n"))
-    cat(paste0("WOE Name: ",variable_name_woe,"\n"))       
+    cat(paste0("Var Name: ",variable_name,"\n"))   
   }
  
-   if(!("sql" %in% colnames(n)))
+   if(any(grepl("case when",n$sql)))
    {
-     sqlstr <-  paste("select df.*, iv.woe as ", variable_name_woe ," from df join iv_df as iv on (df.", variable_name ," = iv.class and iv.variable ='",variable_name,"')",sep="")
-     df <- sqldf(sqlstr,drv="SQLite")
+     sqlstr <- paste("select df.*,",paste(n$sql,collapse= ","), "from df")
+     df <-sqldf(sqlstr,drv="SQLite")
    } else {
-     sqlstr_woe <- ifelse(paste(n$sql,collapse= " ")=="when  then 0.0" || any(is.infinite(n$woe)) ,"0",paste("case ",paste(n$sql,collapse= " "),"else 0 end"))
+     sqlstr_woe <- ifelse(paste(n$sql,collapse= " ")=="when  then 0.0" || any(is.infinite(n$woe)) ,"0",paste("case ",paste(n$sql,collapse= " "),"end"))
      sqlstr <- paste("select df.*,",sqlstr_woe," as", variable_name_woe, "from df")
      df <-sqldf(sqlstr,drv="SQLite")
    }
