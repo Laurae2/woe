@@ -80,28 +80,51 @@ c<-rbind.fill(iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
 bb<-iv.replace.woe(iv.replace.woe(a,iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2)),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
 
 
-# sql output function
+# sql code output function
   
-iv.trans.code <- function(vars,iv) {
+#' Output SQL transformation code 
+#' Only output the vars you need
+
+iv.trans.code <- function(vars,woe,bin) {
   
-  iv_df <- rbind.fill(iv)
-  
-  for (n in vars) { 
+  if (!is.null(woe)) {
+    iv_df <- rbind.fill(woe)
     
-    if(grepl("_woe",n))
-    {  
-      sqlstr <- paste("case",paste(iv_df[iv_df$variable==substr(n,1,nchar(n)-4),]$sql_code,collapse= "\n"),"end as",n,",\n\n")
+    for (n in vars) { 
       
-    } else {
-      
-      sqlstr <- paste(paste(iv_df[grepl(as.character(n),iv_df$sql_code),]$sql_code,collapse= "\n"),"\n")
+      if(grepl("_woe",n))
+      {  
+        sqlstr <- paste("case",paste(iv_df[iv_df$variable==substr(n,1,nchar(n)-4),]$sql_code,collapse= "\n"),"end as",n,",\n\n")
+        sink('transformation_code.txt',append=TRUE)
+        cat(sqlstr)
+        sink()
+      } 
     }
-    sink('transformation code.txt',append=TRUE)
-    cat(sqlstr)
-    sink()
   }
   
+  if (!is.null(bin)) {
+    iv_df <- rbind.fill(bin)
+    
+    for (n in vars) { 
+      
+      if(!grepl("_woe",n)) {
+        
+        sqlstr <- paste(paste(iv_df[grepl(as.character(n),iv_df$sql_code),]$sql_code,collapse= "\n"),"\n")
+        
+        sink('transformation_code.txt',append=TRUE)
+        cat(sqlstr)
+        sink()
+      }
+    }
+  } 
 }
 
-iv.trans.code(c("duration_woe","housing_woe"),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
+
+
+
+
+
+
+iv.trans.code(c("duration_woe","housing_b1"),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2))
+
 
