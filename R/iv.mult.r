@@ -9,20 +9,25 @@
 #' @param summary Only total information value for variable is returned when summary is TRUE. Output is sorted by
 #' information value, starting with highest value.
 #' @param vars List of variables. If not specified, all character variables will be used
+#' @param ivcutoff Only display variables with IV > cutoff
+#' @param sql Option to output SQL transformation code. This has to be TRUE for \code{iv.replace.woe()/iv.trans.code()}
+#' @param topbin Find top bins instead of WOE transformation. 
+#' @param tbcutoff Only select bins with inflation > tbcutoff. 
+#' @param tbpct Bins have to be at least tbpct of whole population.
 #' @param verbose Prints additional details when TRUE. Useful mainly for debugging.
 #' @param rcontrol Additional parameters used for rpart tree generation. Use \code{?rpart.control()} to get more details.
-#' @param cutoff only display IV > cutoff 
 #' @export
 #' @examples
 #' iv.mult(german_data,"gb")
 #' iv.mult(german_data,"gb",TRUE)
-#' iv.mult(german_data,"gb",TRUE,c("ca_status","housing","job","duration")) # str(german_data)
-#' iv.mult(german_data,"gb",vars=c("ca_status","housing","job","duration"))
+#' iv.mult(german_data,"gb",TRUE,c("ca_status","housing","job","duration"),ivcutoff=0.1) # str(german_data)
+#' iv.mult(german_data,"gb",vars=c("ca_status","housing","job","duration"),sql=TRUE)
+#' iv.mult(german_data,"gb",vars=c("ca_status","housing","job","duration"),topbin=TRUE)
 #' iv.mult(german_data,"gb",summary=TRUE, verbose=TRUE)
 #' # Use varlist() function to get all numeric variables
 #' iv.mult(german_data,y="gb",vars=varlist(german_data,"numeric"))
 
-iv.mult <- function(df,y,summary=FALSE,vars=NULL,ivcutoff=0.001,sql=FALSE,verbose=FALSE,rcontrol=NULL,topbin=FALSE,tbcutoff=0.1,tbpct=0.02) {
+iv.mult <- function(df,y,summary=FALSE,vars=NULL,ivcutoff=0.001,sql=FALSE,topbin=FALSE,tbcutoff=0.1,tbpct=0.02,verbose=FALSE,rcontrol=NULL) {
   if(verbose) {
     cat(paste("Started processing of data frame:", deparse(substitute(df)),"\n"))
   }

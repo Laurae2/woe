@@ -8,12 +8,12 @@
 #' @export
 #' @examples
 #' # Replace WoE for list of variables
-#' outiv <- iv.mult(german_data,"gb",vars=c("ca_status","housing","duration"))
+#' outiv <- iv.mult(german_data,"gb",vars=c("ca_status","housing","duration"),sql=TRUE)
 #' x <- iv.replace.woe(german_data,outiv)
 #' str(x)
 #' 
-#' # Replace WoE for all variables
-#' outiv <- iv.mult(german_data,"gb")
+#' # Replace WoE for list of variables
+#' outiv <- iv.mult(german_data,"gb",vars=c("ca_status","housing","duration"),sql=TRUE,topbin=TRUE)
 #' x <- iv.replace.woe(german_data,outiv)
 #' str(x)
 #' 

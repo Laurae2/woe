@@ -14,23 +14,24 @@ setwd("/Users/zzhao/Documents/Fun/")
 # install from local
 install("woe")
 library(woe)
-
+library(rpart)
 # http://www.r-bloggers.com/r-credit-scoring-woe-information-value-in-woe-package/
 
-tt <-iv.mult(german_data,"gb",cutoff=0.05)
+tt <-
+  iv.mult(german_data,"gb",ivcutoff=0.05)
 iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE)
 iv.mult(german_data,"gb",ivcutoff=0.05)
-iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2)
+iv.mult(german_data,"gb",ivcutoff=0.05,topbin=TRUE,tbcutoff=0.2)
 iv.mult(german_data,"gb",ivcutoff=0.05,topbin=TRUE)
 iv.mult(german_data,"gb",TRUE)
 
+iv.mult(german_data,y="gb",vars=varlist(german_data,"numeric"))
 
 t <- iv.mult(german_data,"gb")
 
 iv.plot.summary(iv.mult(german_data,"gb",TRUE))
-iv.mult(german_data,"gb",vars=c("housing","duration"),excl="housing")
 
-iv.mult(german_data,"gb",TRUE,vars=c("housing","duration"),rcontrol=rpart.control(cp=0.003))
+iv.mult(german_data,"gb",TRUE,vars=c("housing","duration"),rcontrol=rpart.control(cp=0.03))
 
 iv.plot.woe(iv.mult(german_data,"gb",vars=c("housing","duration"),summary=FALSE,rcontrol=rpart.control(cp=0.003)))
 
@@ -74,7 +75,7 @@ a$housing[a$housing=="for free"] <- NA
 a$housing <- as.factor(ifelse(is.na(a$housing),"missing",as.character(a$housing)))
 table(a$housing)
 
-x <- iv.replace.woe(a,iv.mult(a,"gb",vars=c("duration","housing")))
+x <- iv.replace.woe(a,iv.mult(a,"gb",vars=c('duration','housing'),sql=TRUE))
 c<-rbind.fill(iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
 
 bb<-iv.replace.woe(iv.replace.woe(a,iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2)),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE))
@@ -125,6 +126,6 @@ iv.trans.code <- function(vars,woe,bin) {
 
 
 
-iv.trans.code(c("duration_woe","housing_b1"),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE),iv.mult(a,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2))
+iv.trans.code(c("duration_woe","housing_b1"),iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE),iv.mult(german_data,"gb",ivcutoff=0.05,sql=TRUE,topbin=TRUE,tbcutoff=0.2))
 
 

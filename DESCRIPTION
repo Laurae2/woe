@@ -1,11 +1,12 @@
 Package: woe
 Title: Tools to calculate Weight of Evidence (WoE) and Information Value.
 Description: Calculate WOE (Weight of Evidence) and IV (Information Value) for
-    variable. Transform raw variables to WOE. Traditionally used in scorecard
-    development.
-Version: 0.3
+    variable. Transform raw variables to WOE, and select top bins. Traditionally
+    used in scorecard development.
+Version: 0.31
 Author: Tomas Greif
 Maintainer: Tomas Greif <greif.tomas@gmail.com>
+Updated by: Orion Zhao
 Depends:
     R (>= 3.0.1)
 Imports:
