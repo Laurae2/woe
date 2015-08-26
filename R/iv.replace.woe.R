@@ -1,9 +1,9 @@
-#' Replace raw variables with Weight of Evidence
+#' Add transformed variables with Weight of Evidence
 #'
-#' Replaces variables in data frame with Weight of Evidence. This will add new columns with "_woe" suffix to specified data frame.
+#' Add variables in data frame with Weight of Evidence or top bins. This will add new columns with "_woe" or "_b*" suffix to specified data frame.
 #'
 #' @param df data frame with original data
-#' @param iv list of information values for variables - output from \code{\link{iv.mult}} with \code{summary=FALSE}.
+#' @param iv list of information values for variables - output from \code{\link{iv.mult}} with \code{summary=FALSE,sql=TRUE}.
 #' @param verbose Prints additional details when TRUE. Useful mainly for debugging.
 #' @export
 #' @examples

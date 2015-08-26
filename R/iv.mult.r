@@ -9,7 +9,7 @@
 #' @param summary Only total information value for variable is returned when summary is TRUE. Output is sorted by
 #' information value, starting with highest value.
 #' @param vars List of variables. If not specified, all character variables will be used
-#' @param ivcutoff Only display variables with IV > cutoff
+#' @param ivcutoff Only display variables with IV > cutoff in summary
 #' @param sql Option to output SQL transformation code. This has to be TRUE for \code{iv.replace.woe()/iv.trans.code()}
 #' @param topbin Find top bins instead of WOE transformation. 
 #' @param tbcutoff Only select bins with inflation > tbcutoff. 

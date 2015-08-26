@@ -10,8 +10,10 @@
 
 iv.plot.woe <- function(iv) {
   x <- rbind.fill(iv)
+  # add row index for reorder factor level later 
+  x$idx <- as.numeric(rownames(x))
   woe <- NULL
-  ggplot(data=x) + geom_bar(aes(y=woe,x=class),stat="identity",position="identity") + 
+  ggplot(data=x) + geom_bar(aes(y=woe,x=reorder(class,idx),fill=woe),stat="identity",position="identity") + 
     facet_wrap(facets=~variable, scales="free_x")  +
     theme(
       panel.grid.major.x = element_blank(),

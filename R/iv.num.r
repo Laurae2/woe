@@ -57,7 +57,7 @@ iv.num <- function(df,x,y,verbose=FALSE,rcontrol=NULL) {
 
   temp <- sqldf("select iv.*, tr.sql as sql from iv_data iv left join tree_rules tr on (iv.class=tr.class_label) order by tr.min,tr.max")
 
-  temp$sql[is.na(temp$sql)] <- paste("when ", x, "is null then ")
+  temp$sql[is.na(temp$sql)] <- paste("when", x, "is null then ")
 
   temp
 }

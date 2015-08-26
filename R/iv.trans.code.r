@@ -35,7 +35,7 @@ iv.trans.code <- function(vars,woe,bin) {
       
       if(!grepl("_woe",n)) {
         
-        sqlstr <- paste(paste(iv_df[grepl(as.character(n),iv_df$sql_code),]$sql_code,collapse= "\n"),"\n")
+        sqlstr <- paste(paste(iv_df[grepl(as.character(n),iv_df$sql_code),]$sql_code,collapse= "\n"),",\n")
         
         sink('transformation_code.txt',append=TRUE)
         cat(sqlstr)

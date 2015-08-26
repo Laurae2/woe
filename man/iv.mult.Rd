@@ -18,7 +18,7 @@ information value, starting with highest value.}
 
 \item{vars}{List of variables. If not specified, all character variables will be used}
 
-\item{ivcutoff}{Only display variables with IV > cutoff}
+\item{ivcutoff}{Only display variables with IV > cutoff in summary}
 
 \item{sql}{Option to output SQL transformation code. This has to be TRUE for \code{iv.replace.woe()/iv.trans.code()}}
 

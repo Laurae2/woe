@@ -39,6 +39,7 @@ out_rule[i,"class_label"] <- paste0(
                     ifelse(!is.na(le),"]",")")
                     )
 out_rule[i,"sql"] <- paste0("when ",
+                              if(is.na(out_rule$min[i]) && is.na(out_rule$max[i])) paste(x,"is not null"),
                               ifelse(is.na(out_rule$min[i]),"",paste(x,out_rule$min_comp[i],out_rule$min[i])),
                               ifelse (!is.na(out_rule$min[i]) && !is.na(out_rule$max[i])," AND ", ""),
                               ifelse(is.na(out_rule$max[i]),"",paste(x,out_rule$max_comp[i],out_rule$max[i])),
