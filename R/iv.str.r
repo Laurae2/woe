@@ -44,6 +44,8 @@ iv.str <- function(df,x,y,sql=TRUE,verbose=FALSE) {
   # rename all missing rows to level missing
 
   df[,x] <- as.factor(ifelse(is.na(df[,x]),"missing",as.character(df[,x])))
+  # df[,x] = factor(df[,x], levels=c(levels(df[,x]), "missing"))
+  # df[,x][is.na(df[,x])] <- "missing"
 
   good <- bad <- NULL # This is needed to avoid NOTES about not visible binding from R CMD check
   

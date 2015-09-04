@@ -6,10 +6,7 @@
 #' WoE (Weight of Evidence) is defined as:
 #' @param df data frame with at least two columns
 #' @param y column (integer or factor) with binary outcome. It is suggested that y is factor with two levels "bad" and "good" If there are no levels good/bad than the following assumptions are applied - if y is integer, than 0=good and 1=bad. If y is factor than level 2 is assumed to mean bad and 1 good.
-#' @param summary Only total information value for variable is returned when summary is TRUE. Output is sorted by
-#' information value, starting with highest value.
 #' @param vars List of variables. If not specified, all character variables will be used
-#' @param ivcutoff Only display variables with IV > cutoff in summary
 #' @param sql Option to output SQL transformation code. This has to be TRUE for \code{iv.replace.woe()/iv.trans.code()}
 #' @param topbin Find top bins instead of WOE transformation. 
 #' @param tbcutoff Only select bins with inflation > tbcutoff. 
@@ -19,15 +16,12 @@
 #' @export
 #' @examples
 #' iv.mult(german_data,"gb")
-#' iv.mult(german_data,"gb",TRUE)
-#' iv.mult(german_data,"gb",TRUE,c("ca_status","housing","job","duration"),ivcutoff=0.1) # str(german_data)
 #' iv.mult(german_data,"gb",vars=c("ca_status","housing","job","duration"),sql=TRUE)
 #' iv.mult(german_data,"gb",vars=c("ca_status","housing","job","duration"),topbin=TRUE)
-#' iv.mult(german_data,"gb",summary=TRUE, verbose=TRUE)
 #' # Use varlist() function to get all numeric variables
 #' iv.mult(german_data,y="gb",vars=varlist(german_data,"numeric"))
 
-iv.mult <- function(df,y,summary=FALSE,vars=NULL,ivcutoff=0.001,sql=FALSE,topbin=FALSE,tbcutoff=0.1,tbpct=0.02,verbose=FALSE,rcontrol=NULL) {
+iv.mult <- function(df,y,vars=NULL,sql=FALSE,topbin=FALSE,tbcutoff=0.1,tbpct=0.02,verbose=FALSE,rcontrol=NULL) {
   if(verbose) {
     cat(paste("Started processing of data frame:", deparse(substitute(df)),"\n"))
   }
@@ -48,32 +42,8 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,ivcutoff=0.001,sql=FALSE,topbin
                   )
 
 
-  
-  if (summary) {
-    if (verbose) cat(paste("Preparing summary","\n"))
-    ivlist <- rbind.fill(ivlist)
-    ivlist <- sqldf("select 
-                        variable as Variable,
-                        sum(miv) as InformationValue, 
-                        count(*) as Bins,
-                        sum(case when good = 0 or bad = 0 then 1 else 0 end) as ZeroBins
-                     from ivlist 
-                     group by variable 
-                     order by InformationValue desc") 
-
-    ivlist$Strength[ivlist$InformationValue >= 1] <- 1
-    ivlist$Strength[ivlist$InformationValue >= .4 & ivlist$InformationValue < 1] <- 2
-    ivlist$Strength[ivlist$InformationValue >= .15 & ivlist$InformationValue < .4] <- 3
-    ivlist$Strength[ivlist$InformationValue >= .05 & ivlist$InformationValue < .15] <- 4
-    ivlist$Strength[ivlist$InformationValue >= .01 & ivlist$InformationValue < .05] <- 5
-    ivlist$Strength[ivlist$InformationValue < .01] <- 6
-    ivlist$Strength <- factor(ivlist$Strength, levels=c(1,2,3,4,5,6), 
-                              labels= c("Suspicious","Very strong","Strong","Average","Weak","Very weak"))
-    ivlist <- ivlist[ivlist$InformationValue>ivcutoff,]
-    ivlist
-  }
   # trim the output, based on sql==true
-  else {
+
     if(topbin) {
       ivlist <- lapply(ivlist, function(x) x[abs(x$inflation)>tbcutoff & x$pct_bin>tbpct,])
       # remove "var" (data frame in list) with no top bins 
@@ -97,7 +67,7 @@ iv.mult <- function(df,y,summary=FALSE,vars=NULL,ivcutoff=0.001,sql=FALSE,topbin
       lapply(ivlist, function(x) x[,!(colnames(x) == "sql")])
     }
   }
-}
+
 
 
 }

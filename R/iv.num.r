@@ -46,9 +46,15 @@ iv.num <- function(df,x,y,verbose=FALSE,rcontrol=NULL) {
 
   if(verbose) cat("    DF Merge",sep="\n")
   
-  # by.x=0 means by row.names
+  # change data frame to data.table to get faster merge. 50x faster!
+  df$obs_id <-as.numeric(row.names(df))
+  df <- data.table(df,key="obs_id")
+  t <- data.table(t,key="obs_id")
 
-  df <- merge(df, t, by.x=0, by.y=1, all=TRUE) # str(df)
+  # data.table merge
+  df <- merge(df, t, all=TRUE) # str(df)
+
+  df <- as.data.frame(df)
   if(verbose) cat("  Calling iv.str for nodes",sep="\n")
   iv_data <- iv.str(df,"tmp_iv_calc_label",y,sql=FALSE)
 

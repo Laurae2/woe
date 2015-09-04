@@ -10,6 +10,7 @@ Updated by: Orion Zhao
 Depends:
     R (>= 3.0.1)
 Imports:
+    data.table,
     ggplot2,
     plyr,
     RColorBrewer,
@@ -27,6 +28,7 @@ Collate:
     'iv.trans.code.r'
     'iv.gen.data.r'
     'iv.plot.woe.r'
+    'iv.summary.r'
     'iv.replace.woe.R'
     'read_german_data.r'
     'varlist.r'
