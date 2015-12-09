@@ -22,29 +22,32 @@
 #' str(x)
 
 iv.replace.woe <- function(df,iv,verbose=FALSE) {
-
-iv_df <- rbind.fill(iv)
-
- for (n in iv) { 
-   variable_name <- n[1,1]
-   variable_name_woe <- paste(variable_name,"_woe",sep="")
-
-  if(verbose) {
-    cat(paste0("Var Name: ",variable_name,"\n"))   
+  
+  iv_df <- rbind.fill(iv)
+  sqlstr <- as.character()
+  
+  for (n in iv) { 
+    variable_name <- n[1,1]
+    variable_name_woe <- paste(variable_name,"_woe",sep="")
+    
+    if(verbose) {
+      cat(paste0("Var Name: ",variable_name,"\n"))   
+    }
+    
+    if(any(grepl("case when",n$sql)))
+    {
+      sqlstr <- paste(sqlstr,',',paste(n$sql,collapse= ","))
+    } else {
+      sqlstr_woe <- ifelse(paste(n$sql,collapse= " ")=="when  then 0.0" || any(is.infinite(n$woe)) ,"0",paste("case ",paste(n$sql,collapse= " "),"end"))
+      sqlstr <- paste(sqlstr, ",",sqlstr_woe," as", variable_name_woe)
+      
+    }
+    
   }
- 
-   if(any(grepl("case when",n$sql)))
-   {
-     sqlstr <- paste("select df.*,",paste(n$sql,collapse= ","), "from df")
-     df <-sqldf(sqlstr,drv="SQLite")
-   } else {
-     sqlstr_woe <- ifelse(paste(n$sql,collapse= " ")=="when  then 0.0" || any(is.infinite(n$woe)) ,"0",paste("case ",paste(n$sql,collapse= " "),"end"))
-     sqlstr <- paste("select df.*,",sqlstr_woe," as", variable_name_woe, "from df")
-     df <-sqldf(sqlstr,drv="SQLite")
-   }
-
- }
-   df
+  sqlstr <- paste("select df.* ",sqlstr, "from df")
+  df <-sqldf(sqlstr,drv="SQLite")
+  return(df)
+  
 }
 
 
