@@ -11,7 +11,8 @@
 iv.plot.woe <- function(iv) {
   x <- rbind.fill(iv)
   # add row index for reorder factor level later 
-  x$idx <- as.numeric(rownames(x))
+  # change from x$idx <- as.numeric(rownames(x)) since there might be levels with same notation..which will mess up the order
+  x$idx <- ave(as.numeric(rownames(x)),x$variable,FUN = rank)
   woe <- NULL
   ggplot(data=x) + geom_bar(aes(y=woe,x=reorder(class,idx),fill=woe),stat="identity",position="identity") + 
     facet_wrap(facets=~variable, scales="free_x")  +
